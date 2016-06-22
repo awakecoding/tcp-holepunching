@@ -23,7 +23,22 @@ namespace Peer
 
         static void Main(string[] args)
         {
+			string server = "54.84.81.140:1618";
+
             Console.Title = "Peer - TCP Hole Punching Proof of Concept";
+
+			for (int i = 0; i < args.Length; i++)
+			{
+				if (args[i].StartsWith("-port")) {
+					PORT = Int32.Parse(args[i + 1]);
+					i++;
+				}
+
+				if (args[i].StartsWith("-server")) {
+					server = args[i + 1];
+					i++;
+				}
+			}
 
             ListenSocket = new NetworkPeer();
             ListenSocket.OnConnectionAccepted += (s, e1) => Console.WriteLine("ListenSocket.OnConnectionAccepted");
@@ -39,11 +54,7 @@ namespace Peer
 
             IntroducerSocket.Bind(new IPEndPoint(IPAddress.Any, PORT));
 
-            Console.Write("Endpoint of the introducer (try 50.18.245.235:1618): ");
-
-            var input = Console.ReadLine();
-            input = (String.IsNullOrEmpty(input)) ? "50.18.245.235:1618" : input;
-            var introducerEndpoint = input.Parse();
+            var introducerEndpoint = server.Parse();
 
             Console.WriteLine(String.Format("Connecting to the Introducer at {0}:{1}...", introducerEndpoint.Address, introducerEndpoint.Port));
             IntroducerSocket.Connect(introducerEndpoint.Address, introducerEndpoint.Port);
